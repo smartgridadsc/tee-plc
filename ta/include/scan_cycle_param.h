@@ -1,0 +1,4 @@
+#ifndef SCAN_CYCLE_PARAM_H
+#define SCAN_CYCLE_PARAM_H
+
+#endif /* SCAN_CYCLE_PARAM_H */
