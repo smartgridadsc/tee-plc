@@ -1,0 +1,29 @@
+# vscode
+.vscode/
+
+# Dependencies
+*.d
+
+# Object files
+*.o
+*.obj
+*.elf
+
+# Linker files
+*.map
+*.lds
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects
+*.so
+*.so.*
+
+# OP-TEE related files
+*.dmp
+*.cmd
+*.ta
