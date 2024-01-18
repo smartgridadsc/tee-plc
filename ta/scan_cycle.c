@@ -258,7 +258,7 @@ static TEE_Result scan_cycle(uint32_t param_types,TEE_Param params[4]){
 	extern uint8_t* __IX100_0;
 	uint8_t* shm = params[2].memref.buffer;
 
-	// zhiang: manually set the shared memory size
+	// manually set the shared memory size
 	// and also the print function
 	TEE_MemMove(shm, __IX100_0, sizeof(uint8_t)*32+sizeof(uint16_t)*32); // bool is 1byte, pointer is 8byte
 

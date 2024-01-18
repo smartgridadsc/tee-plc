@@ -336,7 +336,7 @@ int main(int argc,char **argv)
     //              HARDWARE INITIALIZATION
     //======================================================
     initializeHardware();
-    // initializeMB(); // zhiang: we don't need this 
+    // initializeMB(); 
     initCustomLayer();
     updateBuffersIn();
     updateCustomIn();
@@ -474,15 +474,7 @@ int main(int argc,char **argv)
     int num_cycle = 0;
     while(run_openplc)
     {
-        if(num_cycle >= ROUND) break; // zhiang: for debugging only
-
-        // zhiang:
-        // the idea here is even if PLC is compromised, attackers can not 
-        // launch any attacks except the dos attack
-        // this means he cannot launch a stealthy attack?
-        // He still can. He can by collect the data from I/O image
-        // but he cannot compromise the core logic execution
-        // because he cannot modify the core logic
+        if(num_cycle >= ROUND) break; // for debugging only
 
         // invoke the scan cycle
         printf("Scan Cycle %d ... ", num_cycle);
@@ -520,7 +512,7 @@ int main(int argc,char **argv)
 
         printf("-----------------------------\n");
         printf("Shared memory value is: \n");
-        for(int i=0;i<32; i++){ // zhiang:TODO: hard-coded size 32
+        for(int i=0;i<32; i++){ // TODO: hard-coded size 32
             printf("%x, ", data[i]);
         }
         printf("\n");
@@ -529,7 +521,7 @@ int main(int argc,char **argv)
         }
         printf("\n-----------------------------\n");
         // we still need the timer here to trigger the core logic execution
-        // zhiang: potential abnormal behaviors:
+        // potential abnormal behaviors:
         // the timer is typically 20ms for a whole cycle
         // if we exceed 20ms, there may be a warning
         // updateTime();

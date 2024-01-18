@@ -14,13 +14,39 @@ ta: SW side core logic and modbus/tls implementation with isocket
 
 ### Prerequisites
 
-- You should build this project in Linux. 
-- We use toolchain `aarch64-linux-gnu-` and the building scripts are provided in subfolders `host` and `ta`. You may need to add toolchains to PATH before you run the scripts. The detailed compilation guide for building optee-client and optee-ta can be found in https://optee.readthedocs.io/en/latest/building/gits/optee_examples/optee_examples.html.
-- You need to compile `optee_os` and `optee_client` before you run the scripts. Building scripts for them are already provided. The detailed compilation guide can be found in https://optee.readthedocs.io/en/latest/building/gits/optee_client.html and https://optee.readthedocs.io/en/latest/building/gits/optee_os.html.
+- Build this project in Linux. We built this project on Ubuntu20.04.
+- Use the toolchain `aarch64-linux-gnu-` offered by op-tee. The building scripts are provided in subfolders `host` and `ta`. You may need to add toolchains to PATH before you run the scripts. The detailed compilation guide for building optee-client and optee-ta can be found in https://optee.readthedocs.io/en/latest/building/gits/optee_examples/optee_examples.html.
+- You need to build `optee_os` and `optee_client` seperately before you run the scripts. The detailed building guide can be found in https://optee.readthedocs.io/en/latest/building/gits/optee_client.html and https://optee.readthedocs.io/en/latest/building/gits/optee_os.html.
+
+### Build WolfSSL library
+Our implementation relies on WolfSSL for Modbus/TLS connection. Although op-tee is not natively supported by WolfSSL, [this repo](https://github.com/wenshei/wolfssl) has ported WolfSSL to op-tee. You can follow [this guide](https://github.com/wenshei/wolfssl/blob/master/FOR-OPTEE) to build the static library.
+
+By default, the static library will be found in `/home/ubuntu/projects/wolfssl/lib/libwolfssl.a` and header files will be put in `/home/ubuntu/projects/wolfssl/include`. You can change the output directory to whatever you like by running `./configure -prefix="<path/to/output/directory>"`.
+
+Once you get the static library, put it under folder `ta` (`ta/libwolfssl.a`). You also need to modify the `ta/sub.mk` file to tell the compiler the location of the header files of WolfSSL.
+
+
+### Generate certificates
+Run the following command to generate self-signed certificates for testing.
+
+``` shell
+cd <path/to/wolfssl>
+./certs/renewcerts.sh
+```
+
+Copy the following certificates to `host/certs` folder and `others/pymodbus/certs` folder.
+
+- ca-cert.pem
+- client-ca.pem
+- client-cert.pem
+- client-key.pem
+- root-ca-cert.pem
+- server-cert.pem
+- server-key.pem
 
 ### Build
 
-open bash in current folder. Run the following command:
+Run the following command:
 
 ``` shell
 cd host
@@ -29,6 +55,8 @@ cd ..
 cd ta
 ./compile_ta.sh
 ```
+
+If you see any errors, please make sure you followed the steps in prerequisite and build the static library correctly.
 
 ### Run
 
@@ -245,7 +273,7 @@ void updateTimeStampInSHM(uint16_t core_logic_time)
 
     IMSG("value of ts_idx is %d, should be no larger than 32.", ts_idx);
 
-    // zhiang: TODO: here reuse the int_buffer to pass the measurement to normal world
+    // reuse the int_buffer to pass the measurement to normal world
     for(int i=0; i<16; i++){
         *int_input[100+i] = ts_arr[i];
     }

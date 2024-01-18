@@ -40,7 +40,7 @@
 #include <string_ext.h>
 
 
-// zhiang: port to tee
+// port to tee
 #include <time.h> // optee_libutee
 
 // /* Returned by `div'.  */
@@ -58,10 +58,10 @@ static inline div_t div(long a, long b){
     return rst;
 }
 
-// // zhiang: this is only for test
-// // no round_up, no advanced overflow detect
-// // assumed the parameter has the following format:
-// // [\s*][+|-][0-9*].[0*9]
+// only for test
+// no round_up, no advanced overflow detect
+// assumed the parameter has the following format:
+// [\s*][+|-][0-9*].[0*9]
 static inline double atof(const char* str){
     double rst;
     char* str_p = str; // pointer

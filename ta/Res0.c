@@ -17,7 +17,7 @@ extern unsigned long long common_ticktime__;
 
 #include "POUS.c"
 
-// zhiang: since we only need the data, we don't need the whole struct
+// we only need the data, not the whole struct
 BOOL TASK0;
 PROGRAM0 RES0__INSTANCE0;
 #define INSTANCE0 RES0__INSTANCE0

@@ -1244,7 +1244,7 @@ void updateTimeStampInSHM(uint16_t core_logic_time)
 
     IMSG("value of ts_idx is %d, should be no larger than 32.", ts_idx);
 
-    // zhiang: TODO: here reuse the int_buffer to pass the measurement to normal world
+    // here reuse the int_buffer to pass the measurement to normal world
     for(int i=0; i<16; i++){
         *int_input[100+i] = ts_arr[i];
     }
