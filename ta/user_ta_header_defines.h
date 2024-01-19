@@ -33,9 +33,9 @@
 #define USER_TA_HEADER_DEFINES_H
 
 /* To get the TA UUID definition */
-#include <hello_world_ta.h>
+#include <scan_cycle.h>
 
-#define TA_UUID				TA_HELLO_WORLD_UUID
+#define TA_UUID				TA_SCAN_CYCLE_UUID
 
 /*
  * TA properties: multi-instance TA, no specific attribute
@@ -53,14 +53,14 @@
 #define TA_VERSION	"1.0"
 
 /* The gpd.ta.description property */
-#define TA_DESCRIPTION	"Example of OP-TEE Hello World Trusted Application"
+#define TA_DESCRIPTION	"Minimal TEE-PLC"
 
 /* Extra properties */
 #define TA_CURRENT_TA_EXT_PROPERTIES \
-    { "org.linaro.optee.examples.hello_world.property1", \
+    { "adsc.scan_cycle.property1", \
 	USER_TA_PROP_TYPE_STRING, \
         "Some string" }, \
-    { "org.linaro.optee.examples.hello_world.property2", \
+    { "adsc.scan_cycle.property2", \
 	USER_TA_PROP_TYPE_U32, &(const uint32_t){ 0x0010 } }
 
 #endif /* USER_TA_HEADER_DEFINES_H */

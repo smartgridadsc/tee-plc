@@ -11,14 +11,14 @@
 #include <tee_client_api.h>
 
 /* For the UUID (found in the TA's h-file(s)) */
-#include <hello_world_ta.h>
+#include <scan_cycle.h>
 
 /* the OPTEE related variables are defined here */
 TEEC_Result res;
 TEEC_Context ctx;
 TEEC_Session sess;
 TEEC_Operation op;
-TEEC_UUID uuid = TA_HELLO_WORLD_UUID;
+TEEC_UUID uuid = TA_SCAN_CYCLE_UUID;
 uint32_t err_origin;
 
 TEEC_SharedMemory shm_struct;
@@ -103,7 +103,7 @@ void PROGRAM0_body__(PROGRAM0 *data__, int iter) {
   clock_gettime(CLOCK_MONOTONIC, &tic);
   // ----------------- timing prob core logic tic end -------------------
 
-  res = TEEC_InvokeCommand(&sess, TA_HELLO_WORLD_CMD_CORE_LOGIC, &op, &err_origin);
+  res = TEEC_InvokeCommand(&sess, TA_SCAN_CYCLE_CMD_CORE_LOGIC, &op, &err_origin);
   if (res != TEEC_SUCCESS)
     errx(1, "TEEC_InvokeCommand failed with code 0x%x origin 0x%x",res, err_origin);
 

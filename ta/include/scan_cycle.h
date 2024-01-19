@@ -24,21 +24,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef TA_HELLO_WORLD_H
-#define TA_HELLO_WORLD_H
+#ifndef TA_SCAN_CYCLE_H
+#define TA_SCAN_CYCLE_H
 
 
 /*
  * This UUID is generated with uuidgen
  * the ITU-T UUID generator at http://www.itu.int/ITU-T/asn1/uuid.html
  */
-#define TA_HELLO_WORLD_UUID \
+#define TA_SCAN_CYCLE_UUID \
 	{ 0x8aaaf200, 0x2450, 0x11e4, \
 		{ 0xab, 0xe2, 0x00, 0x02, 0xa5, 0xd5, 0xc5, 0x1b} }
 
 /* The function IDs implemented in this TA */
-#define TA_HELLO_WORLD_CMD_INC_VALUE		0
-#define TA_HELLO_WORLD_CMD_DEC_VALUE		1
-#define TA_HELLO_WORLD_CMD_CORE_LOGIC		2
+#define TA_SCAN_CYCLE_CMD_INC_VALUE		0
+#define TA_SCAN_CYCLE_CMD_DEC_VALUE		1
+#define TA_SCAN_CYCLE_CMD_CORE_LOGIC		2
 
-#endif /*TA_HELLO_WORLD_H*/
+#endif /*TA_SCAN_CYCLE_H*/

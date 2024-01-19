@@ -28,7 +28,7 @@
 #include <tee_internal_api.h>
 #include <tee_internal_api_extensions.h>
 
-#include <hello_world_ta.h>
+#include <scan_cycle.h>
 
 #include "iec_types_all.h"
 #include "accessor.h"
@@ -180,7 +180,7 @@ TEE_Result TA_InvokeCommandEntryPoint(void __maybe_unused *sess_ctx,
 	(void)&sess_ctx; /* Unused parameter */
 
 	switch (cmd_id) {
-	case TA_HELLO_WORLD_CMD_CORE_LOGIC:
+	case TA_SCAN_CYCLE_CMD_CORE_LOGIC:
 		return core_logic(param_types, params);
 	default:
 		return TEE_ERROR_BAD_PARAMETERS;
