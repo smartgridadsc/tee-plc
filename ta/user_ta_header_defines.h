@@ -26,9 +26,9 @@
 #define USER_TA_HEADER_DEFINES_H
 
 /* To get the TA UUID definition */
-#include <scan_cycle.h>
+#include <core_logic_only_ta.h>
 
-#define TA_UUID				TA_SCAN_CYCLE_UUID
+#define TA_UUID				TA_CORE_LOGIC_UUID
 
 /*
  * TA properties: multi-instance TA, no specific attribute
@@ -50,10 +50,10 @@
 
 /* Extra properties */
 #define TA_CURRENT_TA_EXT_PROPERTIES \
-    { "adsc.scan_cycle.property1", \
+    { "adsc.core_logic_only_ta.property1", \
 	USER_TA_PROP_TYPE_STRING, \
         "Some string" }, \
-    { "adsc.scan_cycle.property2", \
+    { "adsc.core_logic_only_ta.property2", \
 	USER_TA_PROP_TYPE_U32, &(const uint32_t){ 0x0010 } }
 
 #endif /* USER_TA_HEADER_DEFINES_H */
