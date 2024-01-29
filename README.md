@@ -115,6 +115,12 @@ If you have no issues building OP-TEE and running it on RPI3, you can switch to 
 git switch minimal ## or git switch enhanced
 ```
 
+## Run OpenPLC Webserver on RPI3
+If you have completed the steps in either `minimal` or `enhanced` branch, you can continue from here to start OpenPLC Webserver and run TEE-PLC from webbrowser.
+
+### Add Slave Devices to OpenPLC configuration file 
+[TODO]
+
 ## Appendix: How to Generate Your Own Control Logic for TEE-PLC
 We basically follow this [tutorial](https://autonomylogic.com/docs/3-2-creating-your-first-project-on-openplc-editor/) to design and build control logic for TEE-PLC. After successful compilation, you may get following files under `openplc/webserver/core`. These following files are needed for you to customize your own TEE-PLC.
 
