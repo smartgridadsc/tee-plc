@@ -107,16 +107,24 @@ You should be able to see all test cases for OP-TEE with their results.
 ### Add to buildroot the libraries needed by OpenPLC
 [TODO: may also mention additional buildroot dependencies]
 
-### How to set up SSH connection
-
-
-## Continue Building TEE-PLC
+## Build Minimal TEE-PLC or Enhanced TEE-PLC
 
 If you have no issues building OP-TEE and running it on RPI3, you can switch to either "minimal" branch for Minimal TEE-PLC or "enhanced" branch Ehanced TEE-PLC to continue.
 
 ``` shell
 git switch minimal ## or git switch enhanced
 ```
+
+## Appendix: How to Generate Your Own Control Logic for TEE-PLC
+We basically follow this [tutorial](https://autonomylogic.com/docs/3-2-creating-your-first-project-on-openplc-editor/) to design and build control logic for TEE-PLC. After successful compilation, you may get following files under `openplc/webserver/core`. These following files are needed for you to customize your own TEE-PLC.
+
+- POUS.c & POUS.h: the code blocks of control logic
+- ResX.c & ResX.h: the resources used by control logic
+- Config.c & Config.h: the parameters to configure behavior of control logic
+- LOCAL_VARIABLES.h: declaration of variables used by control logic
+- glue_vars.c: the glue layer to bind declaration to their definition
+
+You will need to move these files to `/ta` and compile into the secure world TA. For more details, you can refer to README in enhanced TEE-PLC.
 
 ## Acknowledgement
 This research is supported by the National Research Foundation, Prime Minister's Office, Singapore under its Campus for Research Excellence and Technological Enterprise (CREATE) programme.
