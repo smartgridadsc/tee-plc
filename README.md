@@ -1,6 +1,6 @@
 # Minimal TEE-PLC
 
-This repository is the source code of Minimal TEE-PLC. The normal world host application is in ./host, while the secure world trusted application is in ./ta.
+This repository is the source code of Minimal TEE-PLC. The normal world OpenPLC Runtime is in ./host, while the secure world Logic-only TA is in ./ta.
 
 **Note:** Before you start, please make sure you have finished all the steps mentioned in main branch README and successfully run OpenPLC and OP-TEE on RPI3.
 
@@ -20,7 +20,7 @@ cd my_programs
 
 Open the folder `<path/to/optee-project>/my_programs_out`, you should see two files. One is `openplc`, another is `8aaaf200-2450-11e4-abe2-0002a5d5c51b.ta`.
 
-### Copy OpenPLC & TEE-PLC to SD card
+### Copy OpenPLC & Minimal TEE-PLC to SD card
 
 Download the source code of [OpenPLC v3] under branch `OpenPLC` and copy to SD card.
 
@@ -30,6 +30,6 @@ Then copy `openplc` under `<path/to/OpenPLC/webserver/core`. This is the executa
 
 Also copy `8aaaf200-2450-11e4-abe2-0002a5d5c51b.ta` to `<path/to/ta/files>`. It will be called by `openplc` and executed in the secure world.
 
-### Run TEE-PLC
+### Run Minimal TEE-PLC on RPI3
 
-Now you can continue following the `main`` branch README to run TEE-PLC tests with Modbus clients.
+Now you can continue following the `main`` branch README to run Minimal TEE-PLC tests with Modbus clients.
