@@ -38,7 +38,7 @@ Copy the following certificates to `host/certs` folder and `others/pymodbus/cert
 - server-cert.pem
 - server-key.pem
 
-### Build
+### Build Enhanced TEE-PLC
 
 Run the following command:
 
@@ -52,7 +52,7 @@ cd ta
 
 If you see any errors, please make sure you followed the steps in prerequisite and build the static library correctly.
 
-## Debug
+## Debugging Tips
 
 - You may see `0xffffeeee` errors from ta console. Please check if the IP address hardcoded in `ta/mymodbus.c` is the one of your PC.
 - You may see the whole system gets stuck. This is because OP-TEE is scheduled by Linux and SW and NW cannot run simultanously. If SW is stuck, the whole system gets stuck. Please quit qemu and debug before rerun.
