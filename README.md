@@ -1,10 +1,10 @@
 # Enhanced TEE-PLC
 
-This repository is the source code of Enhanced TEE-PLC. The normal world OpenPLC Runtime is in ./host, while the secure world Scan-cycle TA is in ./ta.
+This repository is the source code of Enhanced TEE-PLC. The normal world OpenPLC Runtime is in `./host`, while the secure world Scan-cycle TA is in `./ta`. Simulated slave devices for testing are implemented by pymodbus, and you can find them under `./others/pymodbus`.
 
 **Note:** Before you start, please make sure you have finished all the steps mentioned in main branch README and successfully run OpenPLC and OP-TEE on RPI3.
 
-## Build & Run
+## Build Enhanced TEE-PLC
 
 ### Prerequisites
 
@@ -21,7 +21,7 @@ Once you get the static library, put it under folder `ta` (`ta/libwolfssl.a`). Y
 
 
 ### Generate certificates
-Run the following command to generate self-signed certificates for testing.
+Run the following command to generate self-signed certificates. These certificates are used by both Enhanced TEE-PLC and its slave devices.
 
 ``` shell
 cd <path/to/wolfssl>
@@ -52,8 +52,15 @@ cd ta
 
 If you see any errors, please make sure you followed the steps in prerequisite and build the static library correctly.
 
-## Debugging Tips
+## Run Enhanced TEE-PLC on RPI3
+Refer to the main branch `README.md`  and copy the compiled OpenPLC runtime executable and TA file to the correct folder in RPI3 SD Card.
 
+After booting into linux, please change the system time by running `date MMDDhhmmYYYY`. It doesnot matter you set the system time sooner or later a littel bit than the current real life time, but this step is necessary for certificate verification during TLS connection.
+
+Now you can continue refering to the main branch `README.md` and start running Enhanced TEE-PLC from web browser.
+
+## Debugging Tips
+- If TLS connection failed, please make sure you have changed the system time.
 - You may see `0xffffeeee` errors from ta console. Please check if the IP address hardcoded in `ta/mymodbus.c` is the one of your PC.
 - You may see the whole system gets stuck. This is because OP-TEE is scheduled by Linux and SW and NW cannot run simultanously. If SW is stuck, the whole system gets stuck. Please quit qemu and debug before rerun.
 - Your may see diagnostic information printed in console. Please use `optee_os/scripts/symbolize.py` to see the last function OP-TEE called before exiting. The instruction can be found from this website https://optee.readthedocs.io/en/latest/debug/abort_dumps.html.
