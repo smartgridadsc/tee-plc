@@ -128,7 +128,7 @@ void PROGRAM0_init__(PROGRAM0 *data__, BOOL retain) {
 void PROGRAM0_body__(PROGRAM0 *data__) {
   // Initialise TEMP variables
 
-  // The core logic is moved to TA
+  // The control logic is moved to TA
   // we still need the program0_init_ to work as a block of shared memory
 
   // __SET_LOCATED(data__->,MQ10,,__GET_LOCATED(data__->M10,));
@@ -150,7 +150,7 @@ void PROGRAM0_body__(PROGRAM0 *data__) {
   // __SET_LOCATED(data__->,MQ27,,__GET_LOCATED(data__->M27,));
 
   // ===============================================================
-  // here we donot use int for core logic, we use it for measurement
+  // here we donot use int for control logic, we use it for measurement
   // ===============================================================
   // __SET_LOCATED(data__->,WQ11,,__GET_LOCATED(data__->W11,));
 	// __SET_LOCATED(data__->,WQ12,,__GET_LOCATED(data__->W12,));

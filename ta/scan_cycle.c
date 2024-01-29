@@ -180,7 +180,7 @@ static uint32_t update_modbus_output(void){
 
 static TEE_Result execute_core_logic(void){
 	//=========================================
-	//         iec 61131-3 core logic
+	//         iec 61131-3 control logic
 	//=========================================
 	// TODO: update tick
 	uint32_t tick = 0;
@@ -216,7 +216,7 @@ static TEE_Result scan_cycle(uint32_t param_types,TEE_Param params[4]){
 	execute_core_logic();
 	toc_logic = barrier_read_counter_timer();
 
-	IMSG("core logic execution time: %lu us", pctcnt2us(toc_logic-tic_logic));
+	IMSG("control logic execution time: %lu us", pctcnt2us(toc_logic-tic_logic));
 
 	res_bit |= update_modbus_output(); // already in higher 16 bit
 

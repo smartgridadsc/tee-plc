@@ -483,9 +483,9 @@ int main(int argc,char **argv)
         // invoke the scan cycle
         printf("Scan Cycle %d ... ", num_cycle);
         op.params[0].value.a = num_cycle;
-        // ---------------- timing prob core logic tic begin ------------------
+        // ---------------- timing prob control logic tic begin ------------------
         clock_gettime(CLOCK_MONOTONIC, &tic);
-        // ----------------- timing prob core logic tic end -------------------
+        // ----------------- timing prob control logic tic end -------------------
         res = TEEC_InvokeCommand(&sess, TA_SCAN_CYCLE_EXEC, &op,
                     &err_origin);
         if (res != TEEC_SUCCESS){
@@ -496,10 +496,10 @@ int main(int argc,char **argv)
             errx(1, "TEEC_InvokeCommand failed with code 0x%x origin 0x%x",
                 res, err_origin);
         }
-        // ---------------- timing prob core logic toc begin ------------------
+        // ---------------- timing prob control logic toc begin ------------------
         clock_gettime(CLOCK_MONOTONIC, &toc);
         timing_cycle[num_cycle] = diff(tic, toc);
-        // ----------------- timing prob core logic toc end -------------------
+        // ----------------- timing prob control logic toc end -------------------
 
         printf("Failed slaves: %x\n", op.params[0].value.b);
 
@@ -524,7 +524,7 @@ int main(int argc,char **argv)
             printf("%d ",data[i+1]<<8 | data[i]);
         }
         printf("\n-----------------------------\n");
-        // we still need the timer here to trigger the core logic execution
+        // we still need the timer here to trigger the control logic execution
         // potential abnormal behaviors:
         // the timer is typically 20ms for a whole cycle
         // if we exceed 20ms, there may be a warning
