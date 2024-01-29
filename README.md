@@ -1,14 +1,8 @@
-# TEE-PLC
+# Enhanced TEE-PLC
 
-This project is the implementation of TEE-PLC. We port libmodbus (client) and WolfSSL to TA and test Modbus/TLS. Most of the implementation of Modbus is borrowed from libmodbus. WolfSSL is built into static library and linked into TA. 
+This repository is the source code of Enhanced TEE-PLC. The normal world OpenPLC Runtime is in ./host, while the secure world Scan-cycle TA is in ./ta.
 
-## Folders
-
-others/pymodbus: contains all the pymodbus server and client for testing
-
-host: NW side openplc application
-
-ta: SW side core logic and modbus/tls implementation with isocket
+**Note:** Before you start, please make sure you have finished all the steps mentioned in main branch README and successfully run OpenPLC and OP-TEE on RPI3.
 
 ## Build & Run
 
@@ -58,43 +52,11 @@ cd ta
 
 If you see any errors, please make sure you followed the steps in prerequisite and build the static library correctly.
 
-### Run
-
-#### In qemu
-
-You can copy the compiled exetutable and ta file to optee-qemu's project by running the `copy.sh` script. You may need to change the destination folder to where you build optee-qemu in this file.
-
-``` shell
-cd ..
-./copy.sh
-```
-
-Then enter the folder where you build optee-qemu and start the qemu emulator.
-
-``` shell
-cd build
-make QEMU_VIRTFS_ENABLE=y QEMU_USERNET_ENABLE=y run-only 
-```
-
-When the whole system starts, run the following script in qemu normal world console to mount the host folder into qemu.
-
-``` shell
-mount -t 9p -o trans=virtio host /mnt/host
-```
-
-Then find the folder containing the exetuable `openplc` and ta. Copy ta to `lib/armtz_optee` and make `openplc` runnable. Then execute it. **Please note that in qemu we do not test the exetutable by running `webserver.py`, instead, we directly run `./openplc`**.
-
-#### On RPI3
-
-Please run `make img-help` in optee's build folder and flash the SD card following the instruction.
-
-When the system start, donot forget to change system time by running `date MMDDhhmmYYYY`. You can also configure sshd to enable ssh on RPI3. This can speed up troubleshooting on RPI3.
-
 ## Debug
 
 - You may see `0xffffeeee` errors from ta console. Please check if the IP address hardcoded in `ta/mymodbus.c` is the one of your PC.
 - You may see the whole system gets stuck. This is because OP-TEE is scheduled by Linux and SW and NW cannot run simultanously. If SW is stuck, the whole system gets stuck. Please quit qemu and debug before rerun.
-- Your may see diagnostic information printed in console. Please use `optee_os/scripts/symbolize.py` to see the last function optee called before exiting. The instruction can be found from this website https://optee.readthedocs.io/en/latest/debug/abort_dumps.html.
+- Your may see diagnostic information printed in console. Please use `optee_os/scripts/symbolize.py` to see the last function OP-TEE called before exiting. The instruction can be found from this website https://optee.readthedocs.io/en/latest/debug/abort_dumps.html.
 - Please add the following trace message functions to where you want to inspect the value of variables. OP-TEE offers MSG, IMSG, DMSG, FMSG to differentiate logs into different levels. When building TA, you can configure the CFLAG **CFG_TEE_CORE_LOG_LEVEL={0|1|2|3|4}** in file `ta/Makefile` to specify which level of trace messages will be printed. Typically when we want to debug, we set the log level to 4 to print every message. When we clear out all bugs and want to measure the performance, we set the log level to 0.
 
 | Value | Name              | Description with related macros                              |
@@ -109,11 +71,11 @@ When the system start, donot forget to change system time by running `date MMDDh
 
 ### Variable mapping
 
-This section talks about how the internal memory used by core logic is mapped to modbus client and is updated by modbus client.
+This section talks about how the internal memory used by control logic is mapped to modbus client and is updated by modbus client.
 
 #### Macro definition in `LOCATED_VARIABLES.h`
 
-MatIEC compiles core logic into C code and generates `LOCATED_VARIABLES.h` containing the following macros.
+MatIEC compiles control logic into C code and generates `LOCATED_VARIABLES.h` containing the following macros.
 
 ``` c
 __LOCATED_VAR(BOOL,__IX100_0,I,X,100,0)
@@ -138,7 +100,7 @@ The macros are expanded to boolean pointers `__IX100_0` and boolean value `____I
 
 #### Mapping Macros to Variable Names in `POUS.c` and `POUS.h`
 
-Only the pointers are used in core logic file `POUS.c` and `POUS.h`.
+Only the pointers are used in control logic file `POUS.c` and `POUS.h`.
 
 ``` c
 // POUS.h
@@ -170,7 +132,7 @@ void PROGRAM0_init__(PROGRAM0 *data__, BOOL retain) {
 
 #### Mapping Macros to Internal Buffers in `glueVar.cpp`
 
-Internal buffers used by core logic are basically arrays of boolean and int. These arrays will be assigned to the located variables one by one.
+Internal buffers used by control logic are basically arrays of boolean and int. These arrays will be assigned to the located variables one by one.
 
 ```c
 bool_input[100][0] = __IX100_0;
@@ -211,9 +173,9 @@ void ReadDiscreteInputs(unsigned char *buffer, int bufferSize)
 }
 ```
 
-## Port core logic and Modbus Client to TA
+## Port control logic and Modbus Client to TA
 
-For openplc runtime in NW, we only need to copy the value from SW through shared memory. Thus shared memory registration can be done by a simple parser parsing the variables declared in `LOCATED_VARIABLES.h`. Also, since we donot need modbus_master in NW, we donot need `modbus_master.cpp`. In addition, we donot run core logic in NW, so we donot need the variables in POUS.c. Finally, the mapping from `bool_input` to `IX100_0` has been done by `glueVars.cpp`, we donot need to map ourselves. For shared memory registration, we only need to set the shared memory starting from `IX100_0` and its size to the sum of all the macros.
+For openplc runtime in NW, we only need to copy the value from SW through shared memory. Thus shared memory registration can be done by a simple parser parsing the variables declared in `LOCATED_VARIABLES.h`. Also, since we donot need modbus_master in NW, we donot need `modbus_master.cpp`. In addition, we donot run control logic in NW, so we donot need the variables in POUS.c. Finally, the mapping from `bool_input` to `IX100_0` has been done by `glueVars.cpp`, we donot need to map ourselves. For shared memory registration, we only need to set the shared memory starting from `IX100_0` and its size to the sum of all the macros.
 
 For openplc SW, we need all the mappings from macro to internal memory, to modbus_buffers, to have a complete compatibility with IEC61311-3.
 
@@ -292,7 +254,7 @@ void updateTimeStampInSHM(uint16_t core_logic_time)
 
 The IEC 61131-3 libraries rely on math functions in libc. However, optee_os does not support all math functions in libc. Thus some function blocks provided by IEC 61131-3 libraries cannot compile successfully. OP-TEE suggests to port newlib to `optee_os` since `optee_os` has already ported partial newlib. The project of newlib can be found from https://sourceware.org/newlib/
 
-Current implement of TEE-PLC doesnot use IEC 61131-3 function blocks. We only use headers such as `iec_types_all.h` and `accessor.h`. We also copied following macro expansion code from `iec_std_lib.h` to `POUS.c`, instead of directly include `iec_std_lib.h` in `POUS.c` which can leads to compilation error.
+Current implement of Enhanced TEE-PLC doesnot use IEC 61131-3 function blocks. We only use headers such as `iec_types_all.h` and `accessor.h`. We also copied following macro expansion code from `iec_std_lib.h` to `POUS.c`, instead of directly include `iec_std_lib.h` in `POUS.c` which can leads to compilation error.
 
 ``` c
 #define __lit(type,value,...) (type)value##__VA_ARGS__
