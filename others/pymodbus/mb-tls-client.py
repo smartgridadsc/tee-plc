@@ -2,7 +2,7 @@
 
 # Copyright 2024 Illinois Advanced Research Center at Singapore
 #
-# This file is part of TEE-PLC Project.
+# This file is part of TEE-PLC.
 #
 # TEE-PLC is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
