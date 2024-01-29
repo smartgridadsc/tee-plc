@@ -21,7 +21,7 @@
 #include <tee_internal_api.h>
 #include <tee_internal_api_extensions.h>
 
-#include <core_logic_only_ta.h>
+#include <logic_only_ta.h>
 
 #include "iec_types_all.h"
 #include "accessor.h"
@@ -142,7 +142,7 @@ static TEE_Result core_logic(uint32_t param_types, TEE_Param params[4]){
 	// IMSG("data__->M3.value is %d", *(data__->M3.value));
 	// IMSG("data__->M4.value is %d", *(data__->M4.value));
 	
-	// core logic of PLC
+	// control logic of PLC
   	__SET_LOCATED(data__->,M3,,__GET_LOCATED(data__->M1,));
   	__SET_LOCATED(data__->,M4,,__GET_LOCATED(data__->M2,));
 

@@ -26,7 +26,7 @@
 #define USER_TA_HEADER_DEFINES_H
 
 /* To get the TA UUID definition */
-#include <core_logic_only_ta.h>
+#include <logic_only_ta.h>
 
 #define TA_UUID				TA_CORE_LOGIC_UUID
 
@@ -50,10 +50,10 @@
 
 /* Extra properties */
 #define TA_CURRENT_TA_EXT_PROPERTIES \
-    { "adsc.core_logic_only_ta.property1", \
+    { "adsc.logic_only_ta.property1", \
 	USER_TA_PROP_TYPE_STRING, \
         "Some string" }, \
-    { "adsc.core_logic_only_ta.property2", \
+    { "adsc.logic_only_ta.property2", \
 	USER_TA_PROP_TYPE_U32, &(const uint32_t){ 0x0010 } }
 
 #endif /* USER_TA_HEADER_DEFINES_H */

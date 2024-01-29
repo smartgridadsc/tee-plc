@@ -32,7 +32,7 @@
 #include <tee_client_api.h>
 
 /* For the UUID (found in the TA's h-file(s)) */
-#include <core_logic_only_ta.h>
+#include <logic_only_ta.h>
 
 /* the OPTEE related variables are defined here */
 TEEC_Result res;
@@ -120,9 +120,9 @@ void PROGRAM0_init__(PROGRAM0 *data__, BOOL retain) {
 
 // Code part
 void PROGRAM0_body__(PROGRAM0 *data__, int iter) {
-  // ---------------- timing prob core logic tic begin ------------------
+  // ---------------- timing prob control logic tic begin ------------------
   clock_gettime(CLOCK_MONOTONIC, &tic);
-  // ----------------- timing prob core logic tic end -------------------
+  // ----------------- timing prob control logic tic end -------------------
 
   res = TEEC_InvokeCommand(&sess, TA_CORE_LOGIC_CMD_CORE_LOGIC, &op, &err_origin);
   if (res != TEEC_SUCCESS)

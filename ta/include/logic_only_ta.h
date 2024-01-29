@@ -18,8 +18,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef TA_CORE_LOGIC_ONLY_TA_H
-#define TA_CORE_LOGIC_ONLY_TA_H
+#ifndef TA_LOGIC_ONLY_TA_H
+#define TA_LOGIC_ONLY_TA_H
 
 
 /*
@@ -33,4 +33,4 @@
 /* The function IDs implemented in this TA */
 #define TA_CORE_LOGIC_CMD_CORE_LOGIC	0
 
-#endif /*TA_CORE_LOGIC_ONLY_TA_H*/
+#endif /*TA_LOGIC_ONLY_TA_H*/
