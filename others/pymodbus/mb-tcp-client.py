@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright 2024 Illinois Advanced Research Center at Singapore
+# Copyright 2024 Illinois Advanced Research Center at Singapore Ltd.
 #
 # This file is part of TEE-PLC.
 #
