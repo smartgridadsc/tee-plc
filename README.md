@@ -154,14 +154,14 @@ Then open webbrowser on your PC and go to `http://<RPI3_IP>:8080`, you should be
 
 ### Run Experiments
 
-Now you can run experiments from OpenPLC HMI. You can run pymodbus clients from your PC and see the results from RPI3 console. We have provided both Modbus/TCP and Modbus/TLS servers under folder `pymodbus` for testing Minimal TEE-PLC and Enhanced TEE-PLC.
+Now you can run experiments from OpenPLC HMI. You can run pymodbus clients from your PC and see the results from RPI3 console. We have provided both Modbus/TCP and Modbus/TLS servers under folder `sim_modbus_dev` for testing Minimal TEE-PLC and Enhanced TEE-PLC.
 
 Before you run pymodbus client on your PC, please check the PORT number they use. To run modbus slaves, type:
 
 ``` shell
-python3 pymodbus/modbus_tcp_server.py # for Minimal TEE-PLC
+python3 sim_modbus_dev/mb-tcp-server.py # for Minimal TEE-PLC
 
-# python3 pymodbus/modbus_tls_server.py # for Enhanced TEE-PLC
+# python3 sim_modbus_dev/mb-tls-server.py # for Enhanced TEE-PLC
 
 ```
 
