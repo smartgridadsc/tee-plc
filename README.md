@@ -26,9 +26,7 @@ Download the source code of [OpenPLC v3] under branch `OpenPLC` and copy to SD c
 
 Then copy `openplc` under `<path/to/OpenPLC/webserver/core`. This is the executable file of OpenPLC and will be executed by python server.
 
-[TODO: complete the path to ta folder]
-
-Also copy `8aaaf200-2450-11e4-abe2-0002a5d5c51b.ta` to `<path/to/ta/files>`. It will be called by `openplc` and executed in the secure world.
+Also copy `8aaaf200-2450-11e4-abe2-0002a5d5c51b.ta` to `/lib/optee_armtz`. It will be called by `openplc` and executed in the secure world.
 
 ### Run Minimal TEE-PLC on RPI3
 
