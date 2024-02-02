@@ -40,7 +40,16 @@ Copy the following certificates to `host/certs` folder and `others/pymodbus/cert
 
 ### Build Enhanced TEE-PLC
 
-Run the following command:
+Create a new folder under `<path/to/OP-TEE>`, for example `<path/to/OP-TEE/my_programs>` and copy this repo to this folder. 
+
+``` shell
+cd <path/to/OP-TEE>
+mkdir my_programs
+cd my_programs
+cp -r <path/to/this/folder> .
+```
+
+Then run the following command:
 
 ``` shell
 cd host
@@ -50,10 +59,10 @@ cd ta
 ./compile_ta.sh
 ```
 
-If you see any errors, please make sure you followed the steps in prerequisite and build the static library correctly.
+This command will copy the compiled files under `<path/to/OP-TEE/my_programs_out>`. You should see OpenPLC runtime file (`openplc`) and TA file (`8aaaf200-2450-11e4-abe2-0002a5d5c51b.ta`). If you see any errors, please make sure you followed the steps in prerequisite and build the static library correctly.
 
 ## Run Enhanced TEE-PLC on RPI3
-Refer to the main branch `README.md`  and copy the compiled OpenPLC runtime executable and TA file to the correct folder in RPI3 SD Card.
+Now you can copy the compiled file to RPI3 SD Card. Put `openplc` under `<path/to/OpenPLC_v3/webserver/core` and `8aaaf200-2450-11e4-abe2-0002a5d5c.ta` under `/lib/optee_armtz`.
 
 After booting into linux, please change the system time by running `date MMDDhhmmYYYY`. It doesnot matter you set the system time sooner or later a littel bit than the current real life time, but this step is necessary for certificate verification during TLS connection.
 
