@@ -1,6 +1,6 @@
 # Enhanced TEE-PLC
 
-This repository is the source code of Enhanced TEE-PLC. The normal world OpenPLC Runtime is in `./host`, while the secure world Scan-cycle TA is in `./ta`. Simulated slave devices for testing are implemented by pymodbus, and you can find them under `./others/pymodbus`.
+This repository is the source code of Enhanced TEE-PLC. The normal world OpenPLC Runtime is in `./host`, while the secure world Scan-cycle TA is in `./ta`.
 
 **Note:** Before you start, please make sure you have finished all the steps mentioned in main branch README and successfully run OpenPLC and OP-TEE on RPI3.
 
@@ -28,7 +28,7 @@ cd <path/to/wolfssl>
 ./certs/renewcerts.sh
 ```
 
-Copy the following certificates to `host/certs` folder and `others/pymodbus/certs` folder.
+Copy the following certificates to `host/certs` folder and `sim_modbus_dev/certs` folder.
 
 - ca-cert.pem
 - client-ca.pem
