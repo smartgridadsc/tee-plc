@@ -8,11 +8,11 @@ FIRST RELEASE v1.0 | <2 FEB 2024>
         deleted OpenPLC_v3 file webserver/core/dnp3.cfg
 
     3. file host/modbus_master.cpp
-        deleted OpenPLC_v3 file modbus_master.cpp
+        deleted OpenPLC_v3 file webserver/core/modbus_master.cpp
 
     ******************** Modifications: ********************
     1. file host/interactive_server.cpp
-        commented out lines 72-75, 231, 285, 291, 302, 320, 326, 337, 502, 503 to remove dnp3 feature
+        commented out lines 72-75, 231, 285, 291, 302, 320, 326, 337, 502, 503 from OpenPLC_v3 webserver/core/interactive_server.cpp to disable dnp3 features
 
     ******************** Additions: ********************
     1. file my_modbus.c
