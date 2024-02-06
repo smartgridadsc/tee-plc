@@ -4,11 +4,11 @@ FIRST RELEASE v1.0 | <2 FEB 2024>
     1. file host/dnp3.cpp
         deleted OpenPLC_v3 file webserver/core/dnp3.cpp
 	
-	2. file host/dnp3.cfg 
+    2. file host/dnp3.cfg 
         deleted OpenPLC_v3 file webserver/core/dnp3.cfg
 
-	3. file host/modbus_master.cpp
-	    deleted OpenPLC_v3 file modbus_master.cpp
+    3. file host/modbus_master.cpp
+        deleted OpenPLC_v3 file modbus_master.cpp
 
     ******************** Modifications: ********************
     1. file host/interactive_server.cpp
