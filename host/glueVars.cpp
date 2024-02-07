@@ -1,6 +1,6 @@
 //
 // Modified for TEE-PLC
-// Illinois Advanced Research Center at Singapore 2024
+// Illinois Advanced Research Center at Singapore Ltd. 2024
 //
 //-----------------------------------------------------------------------------
 // Copyright 2015 Thiago Alves

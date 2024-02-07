@@ -1,3 +1,7 @@
+//
+// Modified for TEE-PLC
+// Illinois Advanced Research Center at Singapore Ltd. 2024
+//
 //-----------------------------------------------------------------------------
 // Copyright 2018 Thiago Alves
 // This file is part of the OpenPLC Software Stack.
