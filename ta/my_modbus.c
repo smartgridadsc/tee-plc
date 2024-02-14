@@ -543,15 +543,6 @@ int32_t modbus_recv(modbus_dev_t* slave, uint8_t *msg, uint32_t msg_len){
     return res;
 }
 
-/**
- * @brief 
- * First build request header. 
- * Second modify the req length. 
- * Then send the request
- * @param slave 
- * @param tempBuff 
- * @return int
- */
 static int modbus_read_input_bits(modbus_dev_t* slave, uint8_t* tempBuff){
     // ******************************* Query ******************************
     // build the request header
@@ -777,10 +768,6 @@ static int modbus_read_input_registers(modbus_dev_t* slave, uint16_t* dest){
     return status;
 }
 
-/**
- * @brief 
- * will be invoked in update_modbus_input
- */
 uint32_t querySlaveRead(void){
     ts_idx = 0;
     m.time_entry = read_cntpct();
@@ -878,10 +865,6 @@ uint32_t querySlaveRead(void){
     return res_bit;
 }
 
-/**
- * @brief 
- * will be invoked in update_modbus_output
- */
 uint32_t querySlaveWrite(void){
     uint16_t int_output_index = 0;
     uint16_t bool_output_index = 0;
@@ -953,12 +936,6 @@ uint32_t querySlaveWrite(void){
     return res_bit;
 }
 
-/**
- * @brief 
- * Below the modbus layer, can be implemented by isocket or wolfssl
- * @param slave 
- * @return TEE_Result 
- */
 TEE_Result modbus_close(modbus_dev_t* slave){
     TEE_Result res;
 
