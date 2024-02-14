@@ -22,24 +22,24 @@ FIRST RELEASE v1.0 | <2 FEB 2024>
             void updateBuffersIn_MB(): void updateBuffersIn_MB()
             void updateBuffersOut_MB(): void updateBuffersOut_MB()
 
-        contains functions of modbus communication from modbus.c: 
-            TEE_Result modbus_close(modbus_dev_t* slave): void modbus_close(modbus_t *ctx)
-            TEE_Result modbus_connect(modbus_dev_t *slave): int modbus_connect(modbus_t *ctx)
-            uint8_t compute_meta_len_after_function(int function): static uint8_t compute_meta_length_after_function(int function, msg_type_t msg_type)
-            uint32_t compute_response_length_from_request(uint8_t *req): static unsigned int compute_response_length_from_request(modbus_t *ctx, uint8_t *req)
-            int check_confirmation(modbus_dev_t *slave, uint8_t *req, uint8_t *rsp, int rsp_length): static int check_confirmation(modbus_t *ctx, uint8_t *req, uint8_t *rsp, int rsp_length)
-            static int modbus_read_input_bits(modbus_dev_t* slave, uint8_t* tempBuff): modbus.c: int modbus_read_input_bits(modbus_t *ctx, int addr, int nb, uint8_t *dest)
-            static int read_registers(modbus_dev_t *slave, int function, int addr, int nb, uint16_t *dest): static int read_registers(modbus_t *ctx, int function, int addr, int nb, uint16_t *dest)
-            static int modbus_read_registers(modbus_dev_t* slave, uint16_t* dest): int modbus_read_registers(modbus_t *ctx, int addr, int nb, uint16_t *dest)
-            int modbus_write_coils(modbus_dev_t* slave, uint8_t* src): int modbus_write_bits(modbus_t *ctx, int addr, int nb, const uint8_t *src)
-            static int modbus_write_registers(modbus_dev_t* slave, uint16_t* src): int modbus_write_registers(modbus_t *ctx, int addr, int nb, const uint16_t *src)
-            static int modbus_read_input_registers(modbus_dev_t* slave, uint16_t* dest): int modbus_read_input_registers(modbus_t *ctx, int addr, int nb, uint16_t *dest)
-            static int read_registers(modbus_dev_t *slave, int function, int addr, int nb, uint16_t *dest): static int read_registers(modbus_t *ctx, int function, int addr, int nb, uint16_t *dest)
-            int32_t modbus_send(modbus_dev_t* slave, uint8_t *msg, uint32_t msg_len): static int send_msg(modbus_t *ctx, uint8_t *msg, int msg_length)
-            int modbus_receive_msg(modbus_dev_t *slave, uint8_t *msg): int _modbus_receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type)
-            int32_t modbus_recv(modbus_dev_t* slave, uint8_t *msg, uint32_t msg_len): int modbus_receive(modbus_t *ctx, uint8_t *req)
-            int modbus_send_msg_pre(uint8_t *req, int req_length): static int _modbus_tcp_send_msg_pre(uint8_t *req, int req_length)
-            void modbus_build_tcpreq_hdr(modbus_dev_t* slave, int function, int addr, int nb, uint8_t *req): int modbus_get_header_length(modbus_t *ctx)
+        contains functions of simplified Modbus/TLS client implementation: 
+            TEE_Result modbus_close(modbus_dev_t* slave)
+            TEE_Result modbus_connect(modbus_dev_t *slave)
+            uint8_t compute_meta_len_after_function(int function)
+            uint32_t compute_response_length_from_request(uint8_t *req)
+            int check_confirmation(modbus_dev_t *slave, uint8_t *req, uint8_t *rsp, int rsp_length)
+            static int modbus_read_input_bits(modbus_dev_t* slave, uint8_t* tempBuff)
+            static int read_registers(modbus_dev_t *slave, int function, int addr, int nb, uint16_t *dest)
+            static int modbus_read_registers(modbus_dev_t* slave, uint16_t* dest)
+            int modbus_write_coils(modbus_dev_t* slave, uint8_t* src)
+            static int modbus_write_registers(modbus_dev_t* slave, uint16_t* src)
+            static int modbus_read_input_registers(modbus_dev_t* slave, uint16_t* dest)
+            static int read_registers(modbus_dev_t *slave, int function, int addr, int nb, uint16_t *dest)
+            int32_t modbus_send(modbus_dev_t* slave, uint8_t *msg, uint32_t msg_len)
+            int modbus_receive_msg(modbus_dev_t *slave, uint8_t *msg)
+            int32_t modbus_recv(modbus_dev_t* slave, uint8_t *msg, uint32_t msg_len)
+            int modbus_send_msg_pre(uint8_t *req, int req_length)
+            void modbus_build_tcpreq_hdr(modbus_dev_t* slave, int function, int addr, int nb, uint8_t *req)
 
         contains hook functions of wolfssl sending & receiving:
             int my_IORecv(WOLFSSL* ssl, char* buff, int sz, void* ctx)
@@ -57,10 +57,6 @@ FIRST RELEASE v1.0 | <2 FEB 2024>
         contains timestamp update functions:
             static uint32_t pctcnt2us(uint64_t cnt)
             void updateTimeStampInSHM(uint16_t core_logic_time)
-
-        contains debugging functions:
-            static void hex_print(const char* hint, uint8_t* msg, uint32_t msg_len)
-            void modbus_poll(void)
 
         contains interfaces for scan-cycle ta to control slave devices:
             TEE_Result modbus_close_all(void)
