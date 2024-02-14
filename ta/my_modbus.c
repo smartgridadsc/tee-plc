@@ -1,14 +1,22 @@
-/*
- * Modified for TEE-PLC
- * Illinois Advanced Research Center at Singapore Ltd. 2024
- *
- * Copyright © Stéphane Raimbault <stephane.raimbault@gmail.com>
- *
- * SPDX-License-Identifier: LGPL-2.1-or-later
- *
- * This library implements the Modbus protocol.
- * http://libmodbus.org/
- */
+//-----------------------------------------------------------------------------
+// Copyright 2024 Illinois Advanced Research Center at Singapore Ltd.
+//
+// This file is part of TEE-PLC.
+//
+// TEE-PLC is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// TEE-PLC is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with TEE-PLC.  If not, see <http://www.gnu.org/licenses/>.
+//-----------------------------------------------------------------------------
+
 
 #include "scan_cycle.h"
 #include "my_modbus.h"
@@ -34,7 +42,6 @@ uint16_t int_input_buf[MAX_MB_IO];
 uint16_t int_output_buf[MAX_MB_IO];
 
 // The binding table from handle to isocket_ctx
-// TODO: Only for test. This should change into hashtable
 // The resources are maintained by isocket and wolfssl, we do not need
 // to care about the memory allocation and free.
 TEE_iSocketHandle tcp_ctx[100];
@@ -120,11 +127,6 @@ static void set_slave_holding_read_regs(modbus_dev_t* slave, uint16_t start_addr
     slave->holding_read_regs.start_address = start_addr;
 }
 
-/**
- * @brief
- * Add slaves here and will generate the slave list
- * @return TEE_Result 
- */
 TEE_Result modbus_init(int slave_num){
     wolfSSL_Init();
     modbus_dev_t* slave;
@@ -153,12 +155,6 @@ TEE_Result modbus_init(int slave_num){
     return TEE_SUCCESS;
 }
 
-/**
- * @brief 
- * Below the modbus layer, can be implemented by isocket or wolfssl
- * @param slave 
- * @return TEE_Result 
- */
 TEE_Result modbus_connect(modbus_dev_t *slave){
     TEE_Result res;
     slave->s = slave->slave_id; // TODO: this should be changed to sock_fd
@@ -170,20 +166,6 @@ TEE_Result modbus_connect(modbus_dev_t *slave){
 
     // DMSG("modbus_connect: slave %d 's tcp_ctx index is %u, handle is %p", 
     //         slave->slave_id, idx, tcp_ctx[slave->s]);
-
-    {
-    // uint8_t buf_sim[164] = {1};
-    // hex_print("buf pending to send: ", buf_sim, 164);
-    // buf_sim[163] = 0;
-    // uint32_t len = 164;
-    // TEE_tcpSocket->send(tcp_ctx[slave->s], buf_sim, &len, 100);
-    // DMSG("Sent len: %d", len);
-    // uint8_t* buf_recv = (uint8_t*)TEE_Malloc(100*sizeof(uint8_t),0);
-    // len = 100;
-    // TEE_tcpSocket->recv(tcp_ctx[slave->s], buf_recv, &len, 100);
-    // hex_print("Recv from server: ", buf_recv, len);
-    // TEE_Free(buf_recv);
-    }
 
     if (res != TEE_SUCCESS) {
         EMSG("ERROR: Failed to open() TCP for slave %d, error: %#010x "
@@ -280,19 +262,9 @@ TEE_Result modbus_connect_all(void){
         }
     }
 
-    // for(int i=0; i<total_slave; i++){
-    //     DMSG("connect all: slave %d 's sock_fd is %u, iscoket_fd is %u", 
-    //                 slaves[i]->slave_id, slaves[i]->s, ((isocket_ctx*)tcp_ctx[slaves[i]->s])->handle);
-    // }
-
     return res_bit;
 }
 
-/**
- * @brief 
- * Construct the MDAP header for Modbus TCP
- * @return TEE_Result 
- */
 void modbus_build_tcpreq_hdr(modbus_dev_t* slave, int function, int addr, int nb, uint8_t *req){
     /* Increase transaction ID */
     if (slave->trans_id < UINT16_MAX)
@@ -351,19 +323,6 @@ int compute_data_len_after_meta(modbus_dev_t *slave, uint8_t *msg){
     return length;
 }
 
-/**
- * @brief state machine to receive MDAP payload
- * This function read the packets from I/O buffer twice. 
- * The MDAP header is read during first time. Length of rest packet is used for second read
- * The rest of the payload is read during second time.
- * For the best performance and an unambiguous measurement, we can predict the lengh of the response packets from slaves
- * For simplification, we assume the length is 24-bit boolean type, so we donot need the state machine to read the header
- * to know the length of the rest packet. This reduces the I/O times from 3 times to 2 times. Also the ftrace graph is 
- * more easy to understand. What's more, the timestamp measurement is more straightforward now.
- * @param slave 
- * @param msg 
- * @return int 
- */
 int modbus_receive_msg(modbus_dev_t *slave, uint8_t *msg){
     TEE_Result res;
     int length_to_read;
@@ -378,19 +337,6 @@ int modbus_receive_msg(modbus_dev_t *slave, uint8_t *msg){
 
     step = _STEP_FUNCTION;
 
-    /*********************************************************
-     * To get the best performance, uncomment this part.
-     * Hardcode the length to read at the beginning of this file 
-     * and thus we donot need state machine code below.
-     *********************************************************/
-    // length_to_read = MB_TCP_HEADER_LENGTH + 5;
-    // rc = modbus_recv(slave, msg+msg_length, length_to_read);
-    // msg_length = rc;
-
-    /*********************************************************
-     * To function correctly, use this state machine to read packets
-     * twice. First for MDAP header and Second for the rest data.
-     *********************************************************/
     length_to_read = MB_TCP_HEADER_LENGTH + 1;
 
     IMSG("modbus_recv_msg: length_to_read is %d", length_to_read);
@@ -400,8 +346,6 @@ int modbus_receive_msg(modbus_dev_t *slave, uint8_t *msg){
 
         if(rc <= 0){
             EMSG("ERROR: Failed to read response from iSocket");
-            // modbus_close(slave); // TODO: error recovery
-            // modbus_connect(slave); // This two lines are to reconnect
             return -1;
         }
 
@@ -441,26 +385,14 @@ uint32_t compute_response_length_from_request(uint8_t *req){
     switch (req[offset]) {
     case MB_FC_READ_COILS:
     case MB_FC_READ_INPUTS: {
-        /* Header + nb values (code from write_bits) */
         int nb = (req[offset + 3] << 8) | req[offset + 4];
         length = 2 + (nb / 8) + ((nb % 8) ? 1 : 0);
     }
         break;
     case MB_FC_READ_HOLDING_REGISTERS:
     case MB_FC_READ_INPUT_REGISTERS:
-        /* Header + 2 * nb values */
         length = 2 + 2 * (req[offset + 3] << 8 | req[offset + 4]);
         break;
-    // case MB_FC_READ_EXCEPTION_STATUS:
-    //     length = 3;
-    //     break;
-    // case MB_FC_REPORT_SLAVE_ID:
-    //     /* The response is device specific (the header provides the
-    //        length) */
-    //     return MSG_LENGTH_UNDEFINED;
-    // case MB_FC_MASK_WRITE_REGISTER:
-    //     length = 7;
-    //     break;
     default:
         length = 5;
     }
@@ -478,7 +410,6 @@ int check_confirmation(modbus_dev_t *slave, uint8_t *req, uint8_t *rsp, int rsp_
         EMSG("ERROR: Invalid trans ID received 0x%X (not 0x%X)", (rsp[0]<<8)+rsp[1], (req[0]<<8)+req[1]);
         return -1;
     }
-    
 
     /* check protocol ID */
     if(rsp[2] != 0x0 && rsp[3] != 0x0){
@@ -487,9 +418,6 @@ int check_confirmation(modbus_dev_t *slave, uint8_t *req, uint8_t *rsp, int rsp_
     }
     rsp_len_computed = compute_response_length_from_request(req);
     // DMSG("check_confirmation: rsp_len_computed is %d. Read inputs with 8 bits should be 10.", rsp_len_computed);
-
-    /* TODO: Exception code */
-    // DMSG("Function code: 0x%X", function);
 
     /* Check length */
     if(rsp_length == rsp_len_computed && function < 0x80) {
@@ -525,10 +453,6 @@ int check_confirmation(modbus_dev_t *slave, uint8_t *req, uint8_t *rsp, int rsp_
             req_nb_value = (req[offset + 3] << 8) + req[offset + 4];
             rsp_nb_value = (rsp[offset + 3] << 8) | rsp[offset + 4];
             break;
-        // case MB_FC_REPORT_SLAVE_ID:
-        //     /* Report slave ID (bytes received) */
-        //     req_nb_value = rsp_nb_value = rsp[offset + 1];
-        //     break;
         default:
             /* 1 Write functions & others */
             req_nb_value = rsp_nb_value = 1;
@@ -571,8 +495,6 @@ int32_t modbus_send(modbus_dev_t* slave, uint8_t *msg, uint32_t msg_len){
         EMSG("ERROR: Non-connected ctx cannot send");
         return -1;
     }
-    // DMSG("Sending message to server: %s", msg);
-    hex_print("modbus_send: Sending message to server: ", msg, msg_len);
 
     m.tic_enc = read_cntpct();
     res = wolfSSL_write(_ssl[slave->s].wfssl, msg, msg_len);
@@ -613,18 +535,13 @@ int32_t modbus_recv(modbus_dev_t* slave, uint8_t *msg, uint32_t msg_len){
     IMSG("ts_arr[%d] is ts for tic_dec", ts_idx);
     ts_arr[ts_idx++] = pctcnt2us(m.toc_dec - m.time_entry);
     IMSG("ts_arr[%d] is ts for toc_dec", ts_idx);
-
-
-
     //DMSG("wolfssl_read returns %d", res);
     if(res > 0){
         // IMSG("Received message from server: %s", msg);
-        hex_print("modbus_recv: Received message from server: ", msg, res);
     }
     
     return res;
 }
-
 
 /**
  * @brief 
@@ -654,10 +571,6 @@ static int modbus_read_input_bits(modbus_dev_t* slave, uint8_t* tempBuff){
 
     // send the request
     rc = modbus_send(slave, req, req_len);
-    
-    // *********************************************************************
-    // ***************************** Response ******************************
-    // then receive the response
 
     if(rc > 0){
         int i, temp, bit;
@@ -684,12 +597,9 @@ static int modbus_read_input_bits(modbus_dev_t* slave, uint8_t* tempBuff){
                 tempBuff[pos++] = (temp & bit) ? 1 : 0;
                 bit = bit << 1;
             }
-            // hex_print("modbus read input bits: tempBuff is:", tempBuff, nb);
         }
     }
-    // then read the result to tempBuff
-    
-    // *********************************************************************
+
     if(rc == -1)
         return rc;
     else
@@ -771,7 +681,6 @@ static int modbus_write_registers(modbus_dev_t* slave, uint16_t* src){
     }
 
     modbus_build_tcpreq_hdr(slave,MB_FC_WRITE_MULTIPLE_REGISTERS,addr, nb, req);
-    // hex_print("modbus_write_huild_tcp_hdr generate: ", req, req_length);
     byte_count = nb * 2;
     req[req_length++] = byte_count;
 
@@ -918,24 +827,9 @@ uint32_t querySlaveRead(void){
                     bool_input_index += slaves[i]->dis_inputs.num_regs;
                 } else {
                     // DMSG("Query slave read: return_val is: %d", return_val);
-                    // char *msg = TEE_Malloc(50*sizeof(char), 0);
-                    // snprintf(msg, 50, "Query slave[%d] read: bool_input_buf is:", slaves[i]->slave_id);
-                    // hex_print(msg, tempBuff, return_val);
                     for(int j=0; j<return_val; j++){
                         bool_input_buf[bool_input_index] = tempBuff[j];
                         bool_input_index++;
-                    }
-                    {
-                    // //-----------------------------------------------
-                    // // only for debug
-                    // //-----------------------------------------------
-                    // IMSG("bool_input_index is: %d", bool_input_index);
-                    // IMSG("bool_input_buf content is:");
-                    // for(int j=0; j<bool_input_index; j++){
-                    //     printf("%d, ", bool_input_buf[j]);
-                    // }
-                    // IMSG("");
-                    // //-----------------------------------------------
                     }
                 }
                 TEE_Free(tempBuff);
@@ -956,18 +850,6 @@ uint32_t querySlaveRead(void){
                         int_input_buf[int_input_index] = tempBuff[j];
                         int_input_index++;
                     }
-                    {
-                    // //-----------------------------------------------
-                    // // only for debug
-                    // //-----------------------------------------------
-                    // IMSG("int_input_index is: %d", int_input_index);
-                    // IMSG("int_input_buf content is:");
-                    // for(int j=0; j<int_input_index; j++){
-                    //     printf("%d, ", int_input_buf[j]);
-                    // }
-                    // IMSG("");
-                    // //-----------------------------------------------
-                    }
                 }
                 TEE_Free(tempBuff);
             }
@@ -986,18 +868,6 @@ uint32_t querySlaveRead(void){
                     for(int j=0; j<return_val; j++){
                         int_input_buf[int_input_index] = tempBuff[j];
                         int_input_index++;
-                    }
-                    {
-                    // //-----------------------------------------------
-                    // // only for debug
-                    // //-----------------------------------------------
-                    // IMSG("int_holding_input_index is: %d", int_input_index);
-                    // IMSG("int_holding_input_buf content is:");
-                    // for(int j=0; j<int_input_index; j++){
-                    //     printf("%d, ", int_input_buf[j]);
-                    // }
-                    // IMSG("");
-                    // //-----------------------------------------------
                     }
                 }
                 TEE_Free(tempBuff);
@@ -1096,12 +966,6 @@ TEE_Result modbus_close(modbus_dev_t* slave){
     IMSG("WARNING: Closing slave %d ....", slave->slave_id);
     if((res = wolfSSL_shutdown(_ssl[slave->s].wfssl)) != SSL_SUCCESS){
         IMSG("Waiting for peer to close ssl session on slave %d", slave->slave_id);
-        // int ecode;
-        // wolfSSL_get_error(_ssl[slave->s].wfssl, ecode);
-        // char estring[80] = {0};
-        // wolfSSL_ERR_error_string(ecode, estring);
-        // EMSG("%s",estring);
-        // return -1; // cannot directly return, we need to 
     }
 
     // then free ssl ctx
@@ -1151,55 +1015,6 @@ void updateBuffersIn_MB()
 
         if (int_input[100+i] != NULL) *int_input[100+i] = int_input_buf[i];
     }
-    {
-    // //-----------------------------------------------------
-    // // only for debug
-    // //-----------------------------------------------------
-    // for (int i = 0; i < MAX_MB_IO; i++)
-    // {
-    //     if (bool_input[100+(i/8)][i%8] != NULL){
-    //         IMSG("bool_input[%d][%d] is %d", 100+(i/8), i%8, *bool_input[100+(i/8)][i%8]);
-    //     }
-    // }
-
-    // extern uint8_t* __IX100_0;
-    // extern uint8_t* __IX100_1;
-    // extern uint8_t* __IX100_2;
-    // extern uint8_t* __IX100_3;
-    // extern uint8_t* __IX100_4;
-    // extern uint8_t* __IX100_5;
-    // extern uint8_t* __IX100_6;
-    // extern uint8_t* __IX100_7;
-
-    // printf("addr of IX100.0 is %p, addr of bool_input[0][0] is %p\n", 
-    //         &__IX100_0, bool_input[100][0]);
-    // printf("addr of IX100.1 is %p, addr of bool_input[0][1] is %p\n", 
-    //         &__IX100_1, bool_input[100][1]);
-    // printf("addr of IX100.2 is %p, addr of bool_input[0][2] is %p\n", 
-    //         &__IX100_2, bool_input[100][2]);
-    // printf("addr of IX100.3 is %p, addr of bool_input[0][3] is %p\n", 
-    //         &__IX100_3, bool_input[100][3]);
-    // printf("addr of IX100.4 is %p, addr of bool_input[0][4] is %p\n", 
-    //         &__IX100_4, bool_input[100][4]);
-    // printf("addr of IX100.5 is %p, addr of bool_input[0][5] is %p\n", 
-    //         &__IX100_5, bool_input[100][5]);
-    // printf("addr of IX100.6 is %p, addr of bool_input[0][6] is %p\n", 
-    //         &__IX100_6, bool_input[100][6]);
-    // printf("addr of IX100.7 is %p, addr of bool_input[0][7] is %p\n", 
-    //         &__IX100_7, bool_input[100][7]);
-
-    // uint8_t* ix = __IX100_0;
-
-    // printf("From IX100.0, value is: \n");
-    // for (int i=0; i<32; i++){
-    //     printf("%d ",ix[i]);
-    // }
-    // for(int i=32; i<32+16; i+=2){ // each register takes 2 bytes
-    //     printf("0x%x ",ix[i+1]<<8 | ix[i]);
-    // }
-    // printf("\n");
-    // //------------------------------------------------------
-    }
 }
 
 void updateBuffersOut_MB()
@@ -1211,30 +1026,6 @@ void updateBuffersOut_MB()
         }
 
         if (int_output[100+i] != NULL) int_output_buf[i] = *int_output[100+i];
-    }
-
-    {
-    // //-----------------------------------------------------
-    // // only for debug
-    // //-----------------------------------------------------
-    // for (int i = 0; i < MAX_MB_IO; i++)
-    // {
-    //     if (bool_output[100+(i/8)][i%8] != NULL){
-    //         IMSG("bool_output[%d][%d] is %d", 100+(i/8), i%8, *bool_output[100+(i/8)][i%8]);
-    //     }
-    // }
-
-    // extern uint8_t* __IX100_0;
-    // uint8_t* ix = __IX100_0;
-    // printf("From IX100.0, value is: \n");
-    // for (int i=0; i<32; i++){
-    //     printf("%d ",ix[i]);
-    // }
-    // for(int i=32; i<32+16; i+=2){ // each register takes 2 bytes
-    //     printf("0x%x ",ix[i+1]<<8 | ix[i]);
-    // }
-    // printf("\n");
-    // //------------------------------------------------------
     }
 }
 
@@ -1259,58 +1050,7 @@ void updateTimeStampInSHM(uint16_t core_logic_time)
     *int_output[107] = core_logic_time;
     *int_output[108] = m.time_enc;
     *int_output[109] = m.time_dec; 
-
-    // MSG("address of int_input[107] is: %p", int_input[107]);
-    // MSG("address of int_output[100] is: %p", int_output[100]);
-
-    // for(int i=0; i<16; i++){
-    //     MSG("int_input[%d]: %d", 100+i, *int_input[100+i]);
-    // }
-
-    // for(int i=0; i<16; i++){
-    //     MSG("int_output[%d]: %d", 100+i, *int_output[100+i]);
-    // }
 }
-
-
-/**
- * @brief 
- * Test Utilities: print hex
- * @param hint The message want to print first
- * @param msg 
- * @param msg_len 
- */
-static void hex_print(const char* hint, uint8_t* msg, uint32_t msg_len){
-#if __DEBUG__
-    MSG("%s", hint);
-    char* str =(char*)TEE_Malloc((msg_len*3+2)*sizeof(uint8_t),0); // *3 means "xx_" +2 means \0\0
-    char* str_p = str;
-    for(uint32_t i=0; i<msg_len; i++){
-        int offset = sprintf(str_p, "%02x ", msg[i]);
-        str_p += offset;
-    }
-    MSG("%s", str);
-    TEE_Free(str);
-#endif
-}
-
-/**
- * @brief 
- * Test modbus_send and modbus_recv.
- */
-void modbus_poll(void){
-    for(int i=0; i<total_slave; i++){
-        uint8_t* msg = "test";
-        int32_t sent_len;
-        sent_len = modbus_send(slaves[i], msg, 5);
-
-        uint8_t* msg_recv = TEE_Malloc(100*sizeof(uint8_t),0);
-        int32_t msg_len = 100;
-        modbus_recv(slaves[i], msg_recv, msg_len);
-        TEE_Free(msg_recv);
-    }
-}
-
 
 // ctx here is actually the slave->s
 int my_IORecv(WOLFSSL* ssl, char* buff, int sz, void* ctx) {
@@ -1325,13 +1065,6 @@ int my_IORecv(WOLFSSL* ssl, char* buff, int sz, void* ctx) {
     //DMSG("My_IORecv: sock_fd recovered is %u.", s);
     //DMSG("My_IORecv: handle recovered is %p.", tcp_ctx[s]);
 
-    // if (tcp_ctx[s] == 0x0) {
-    //     DMSG("tcp_ctx == 0x0, will panic\n");
-    // } else {
-    //     DMSG("tcp_ctx == %d, proto_error is %x\n",
-    //         ((isocket_ctx*)tcp_ctx[s])->handle, ((isocket_ctx*)tcp_ctx[s])->proto_error);
-    // }
-
     m.tic_read = read_cntpct();
     res = TEE_tcpSocket->recv(tcp_ctx[s], buff, &length, timeout);
     m.toc_read = read_cntpct();
@@ -1344,10 +1077,6 @@ int my_IORecv(WOLFSSL* ssl, char* buff, int sz, void* ctx) {
     IMSG("ts_arr[%d] is ts for tic_read", ts_idx);
     ts_arr[ts_idx++] = pctcnt2us(m.toc_read - m.time_entry);
     IMSG("ts_arr[%d] is ts for toc_read", ts_idx);
-
-
-    //DMSG("after invoking my_IORecv\n");
-    //DMSG("res = %d\n", res);
 
     m.tic_dec = read_cntpct();
 
@@ -1362,33 +1091,18 @@ int my_IORecv(WOLFSSL* ssl, char* buff, int sz, void* ctx) {
         }
         return -1;
     } else {
-        // DMSG("received %d bytes\n", length);
-        // hex_print("isocket received buffer: ", buff, length);
         return length;
     }
 }
-
 
 int my_IOSend(WOLFSSL* ssl, char* buff, int sz, void* ctx) {
 
     TEE_Result res;
     uint32_t length = (uint32_t)sz;
-    
     uint32_t s = *(uint32_t*)ctx;
-    // DMSG("My_IOSend: sock_fd recovered is %u.", s);
-    // DMSG("My_IOSend: handle recovered is %p.", tcp_ctx[s]);
-
-    // if (tcp_ctx[s] == 0x0) {
-    //  DMSG("tcp_ctx == 0x0, will panic\n");
-    // } else {
-    //     DMSG("tcp_ctx == %d, proto_error is %x\n",
-    //         ((isocket_ctx*)tcp_ctx[s])->handle, ((isocket_ctx*)tcp_ctx[s])->proto_error);
-    // }
     
     if (buff == NULL) {
         EMSG("ERROR: buff == NULL, will panic\n");
-    } else {
-        // hex_print("isocket is sending: ", buff, length);
     }
 
     m.toc_enc = read_cntpct();
@@ -1416,16 +1130,6 @@ int my_IOSend(WOLFSSL* ssl, char* buff, int sz, void* ctx) {
     IMSG("ts_arr[%d] is ts for tic_write", ts_idx);
     ts_arr[ts_idx++] = pctcnt2us(m.toc_write-m.time_entry);
     IMSG("ts_arr[%d] is ts for toc_write", ts_idx);
-
-
-    // uint32_t rest_len = length;
-    // while(rest_len){
-    //     uint32_t len_to_send = rest_len;
-    //     DMSG("pending len is %d", len_to_send);
-    //     res = TEE_tcpSocket->recv(tcp_ctx[s], buff, &len_to_send, 2000);
-    //     DMSG("sent buff len is: %d", len_to_send);
-    //     rest_len -= len_to_send;
-    // }
 
     if (res != TEE_SUCCESS) {
         EMSG("ERROR: error while sending...\n");
