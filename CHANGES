@@ -16,7 +16,7 @@ FIRST RELEASE v1.0 | <2 FEB 2024>
 
     ******************** Additions: ********************
     1. file my_modbus.c
-        contains functions to query modbus slave devices from modbus_master.cpp:
+        contains functions to query modbus slave devices from OpenPLC_v3 webserver/core/modbus_master.cpp:
             uint32_t querySlaveRead(void): void *querySlaveDevices(void *arg)
             uint32_t querySlaveWrite(void): void *querySlaveDevices(void *arg)
             void updateBuffersIn_MB(): void updateBuffersIn_MB()
